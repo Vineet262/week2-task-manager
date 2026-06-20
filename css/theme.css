@@ -1,0 +1,351 @@
+/* =============================================
+   TaskFlow — Theme Variables
+   Dark Mode (default) + Light Mode
+   ============================================= */
+
+/* === Dark Theme (default) === */
+[data-theme="dark"] {
+    --bg-base:         #0d0f17;
+    --bg-surface:      #161826;
+    --bg-elevated:     #1e2132;
+    --bg-hover:        #252840;
+    --bg-card:         #1a1d2e;
+
+    --border-subtle:   rgba(255, 255, 255, 0.06);
+    --border-focus:    rgba(99, 102, 241, 0.6);
+
+    --text-primary:    #f1f5f9;
+    --text-secondary:  #94a3b8;
+    --text-muted:      #64748b;
+
+    --accent-primary:  #6366f1;
+    --accent-hover:    #818cf8;
+    --accent-glow:     rgba(99, 102, 241, 0.2);
+
+    --shadow-sm:       0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg:       0 10px 40px rgba(0, 0, 0, 0.6);
+
+    --scrollbar-thumb: rgba(99, 102, 241, 0.4);
+    --scrollbar-track: rgba(255, 255, 255, 0.04);
+}
+
+/* === Light Theme === */
+[data-theme="light"] {
+    --bg-base:         #f8faff;
+    --bg-surface:      #ffffff;
+    --bg-elevated:     #f0f4ff;
+    --bg-hover:        #e8eeff;
+    --bg-card:         #ffffff;
+
+    --border-subtle:   rgba(0, 0, 0, 0.07);
+    --border-focus:    rgba(99, 102, 241, 0.5);
+
+    --text-primary:    #1e1b4b;
+    --text-secondary:  #4b5563;
+    --text-muted:      #9ca3af;
+
+    --accent-primary:  #6366f1;
+    --accent-hover:    #4f46e5;
+    --accent-glow:     rgba(99, 102, 241, 0.12);
+
+    --shadow-sm:       0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg:       0 10px 40px rgba(0, 0, 0, 0.1);
+
+    --scrollbar-thumb: rgba(99, 102, 241, 0.3);
+    --scrollbar-track: rgba(0, 0, 0, 0.04);
+}
+
+/* === Global Theme Applications === */
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* Header */
+.app-header {
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 28px;
+}
+
+/* Icon Buttons */
+.icon-btn {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+}
+
+.icon-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-focus);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.stat-value {
+    color: var(--text-primary);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+}
+
+/* Progress Bar Background */
+.progress-bar-wrap {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Task Form */
+.task-form {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Task Input */
+.task-input {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+}
+
+.task-input::placeholder { color: var(--text-muted); }
+
+.input-icon { color: var(--text-secondary); }
+
+.char-count { color: var(--text-muted); }
+
+/* Form Select */
+.form-select {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+}
+
+.select-wrapper::after { color: var(--text-secondary); }
+
+/* Error */
+.error-message { color: #f87171; }
+
+/* Search */
+.search-input {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+}
+
+.search-input::placeholder { color: var(--text-muted); }
+
+.search-icon { color: var(--text-secondary); }
+
+.clear-search {
+    color: var(--text-muted);
+    background: var(--bg-hover);
+}
+
+/* Filter Tabs */
+.filter-tab {
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+}
+
+.filter-tab:not(.active):hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Bulk Actions */
+.bulk-actions {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+}
+
+.bulk-selected { color: var(--text-secondary); }
+.bulk-btn { color: inherit; }
+.bulk-cancel { color: var(--text-secondary); }
+
+/* Task List Title */
+.task-list-title { color: var(--text-muted); }
+
+/* Text Buttons */
+.text-btn { color: var(--text-primary); }
+
+/* Empty State */
+.empty-illustration { color: var(--text-secondary); }
+.empty-title { color: var(--text-secondary); }
+.empty-desc { color: var(--text-muted); }
+
+/* Task Items */
+.task-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+}
+
+.task-item:hover {
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-card);
+}
+
+.task-item.drag-over {
+    background: var(--bg-elevated) !important;
+    box-shadow: var(--shadow-md);
+}
+
+/* Checkbox */
+.task-checkbox {
+    border-color: var(--border-subtle);
+    background: var(--bg-elevated);
+}
+
+.task-checkbox:hover {
+    border-color: var(--accent-primary);
+}
+
+.task-select-cb {
+    border-color: var(--border-subtle);
+    background: var(--bg-elevated);
+}
+
+/* Task Text */
+.task-text { color: var(--text-primary); }
+
+/* Task Meta */
+.due-date-badge { color: var(--text-muted); }
+.created-at { color: var(--text-muted); }
+
+/* Task Action Buttons */
+.task-action-btn {
+    color: var(--text-muted);
+    background: transparent;
+}
+
+/* Drag Handle */
+.drag-handle { color: var(--text-muted); }
+
+/* Modal */
+.modal {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+}
+
+.modal-title { color: var(--text-primary); }
+
+.modal-close {
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+}
+
+.modal-close:hover { color: var(--text-primary); }
+
+.edit-textarea {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+}
+
+.btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+}
+
+.btn-secondary:hover { color: var(--text-primary); }
+
+/* Toast */
+.toast {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Shortcuts */
+.shortcuts-panel {
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+}
+
+.shortcuts-toggle { color: var(--text-secondary); }
+
+.shortcut-item { color: var(--text-secondary); }
+
+kbd {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Form Labels */
+.form-label { color: var(--text-secondary); }
+
+/* Input for date and category in dark mode */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.4);
+}
+
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+}
+
+/* === Theme Toggle Animation === */
+[data-theme="dark"] .sun-icon  { opacity: 1; transform: rotate(0deg) scale(1); }
+[data-theme="dark"] .moon-icon { opacity: 0; transform: rotate(90deg) scale(0); }
+
+[data-theme="light"] .sun-icon  { opacity: 0; transform: rotate(-90deg) scale(0); }
+[data-theme="light"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1); }
+
+/* === Orb Colors in Light Mode === */
+[data-theme="light"] .orb-1 {
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+}
+[data-theme="light"] .orb-2 {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+}
+[data-theme="light"] .orb-3 {
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+}
+
+/* Light Mode header */
+[data-theme="light"] .app-header {
+    background: rgba(248, 250, 255, 0.9);
+}
+
+/* Transition for smooth theme switching */
+body,
+.task-form,
+.task-item,
+.stat-card,
+.modal,
+.toast,
+.filter-tab,
+.search-input,
+.form-select,
+.task-input,
+.edit-textarea,
+.icon-btn,
+.shortcuts-panel,
+kbd {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
