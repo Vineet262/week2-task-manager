@@ -33,12 +33,22 @@ week2-task-manager/
 │   ├── style.css       # Layout, components, animations
 │   └── theme.css       # Dark/Light theme CSS variables
 ├── js/
-│   ├── utils.js        # Pure utility functions (no DOM)
-│   ├── storage.js      # localStorage persistence layer
-│   ├── ui.js           # DOM rendering & UI components
-│   └── app.js          # Main TaskManager class & event handling
+│   ├── utils.js        # Pure utilities & central CONSTANTS configuration
+│   ├── storage.js      # localStorage persistence (Dependency Injection applied)
+│   ├── ui.js           # DOM rendering & isolated UI component logic
+│   └── app.js          # Organized into 4 sub-modules: Filter pipeline, DragDrop, TaskManager, EventHandlers
 └── README.md
 ```
+
+### 🏗️ Architecture & Modular Design Improvements
+This project strictly follows the 4-file JavaScript constraint while implementing advanced modular design principles to prevent "God Objects" and tight coupling:
+- **Centralized Config:** All magic values and constants are centralized in `utils.js` (as `CONSTANTS`).
+- **Internal Modules in `app.js`:** Instead of a single 700+ line class, `app.js` is divided into four distinct encapsulated modules:
+  1. `Filter`: A pure function pipeline for searching and sorting.
+  2. `DragDrop`: A self-contained drag-and-drop subsystem that communicates via callbacks.
+  3. `TaskManager`: A lean orchestrator focused only on business logic and state.
+  4. `EventHandlers`: Completely separated DOM event wiring.
+- **Dependency Injection:** `storage.js` receives utility functions (like downloading backups) via explicit parameters rather than implicit global coupling.
 
 ---
 

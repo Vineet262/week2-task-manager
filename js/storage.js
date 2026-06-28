@@ -1,22 +1,23 @@
 /**
  * storage.js — TaskFlow Data Persistence Layer
- * Handles all localStorage interactions and data backup/restore
+ * Handles all localStorage interactions and data backup/restore.
+ *
+ * Dependencies: utils.js (loaded before this file)
  */
 
 'use strict';
 
 const Storage = (() => {
-    const TASKS_KEY    = 'taskflow_tasks';
-    const THEME_KEY    = 'taskflow_theme';
-    const SORT_KEY     = 'taskflow_sort';
-    const FILTER_KEY   = 'taskflow_filter';
-    const APP_VERSION  = '1.0.0';
+    const { TASKS_KEY, THEME_KEY, SORT_KEY, FILTER_KEY } = CONSTANTS.STORAGE;
+    const { APP_VERSION }                                 = CONSTANTS;
+    const { VALUES: PRIORITY_VALUES, DEFAULT: DEFAULT_PRIORITY } = CONSTANTS.PRIORITY;
+    const { DEFAULTS }                                    = CONSTANTS;
 
     // ─── Tasks ──────────────────────────────────────────────────────────────
 
     /**
-     * Load tasks from localStorage
-     * @returns {Array} Array of task objects
+     * Load tasks from localStorage.
+     * @returns {Object[]} Array of task objects
      */
     const loadTasks = () => {
         try {
@@ -24,8 +25,7 @@ const Storage = (() => {
             if (!raw) return [];
             const parsed = JSON.parse(raw);
             if (!Array.isArray(parsed)) return [];
-            // Migrate tasks if needed (future-proof)
-            return parsed.map(migrateTask);
+            return parsed.map(_migrateTask);
         } catch (err) {
             console.error('[Storage] Failed to load tasks:', err);
             return [];
@@ -33,8 +33,8 @@ const Storage = (() => {
     };
 
     /**
-     * Save tasks to localStorage
-     * @param {Array} tasks
+     * Save tasks to localStorage.
+     * @param {Object[]} tasks
      * @returns {boolean} success
      */
     const saveTasks = (tasks) => {
@@ -48,7 +48,7 @@ const Storage = (() => {
     };
 
     /**
-     * Clear all tasks from localStorage
+     * Clear all tasks from localStorage.
      */
     const clearTasks = () => {
         try {
@@ -59,67 +59,62 @@ const Storage = (() => {
     };
 
     /**
-     * Migrate a task object to ensure all required fields are present
+     * Migrate a task object to ensure all required fields are present.
+     * Uses a simple inline ID generator to avoid a circular dependency on Utils.
      * @param {Object} task
      * @returns {Object}
      */
-    const migrateTask = (task) => ({
-        id:          task.id || Utils.generateId(),
-        text:        task.text || '',
-        completed:   Boolean(task.completed),
-        createdAt:   task.createdAt || new Date().toISOString(),
-        updatedAt:   task.updatedAt || task.createdAt || new Date().toISOString(),
-        priority:    ['low', 'medium', 'high'].includes(task.priority) ? task.priority : 'medium',
-        dueDate:     task.dueDate || '',
-        category:    task.category || '',
-        order:       typeof task.order === 'number' ? task.order : 0,
+    const _migrateTask = (task) => ({
+        id:        task.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+        text:      task.text || '',
+        completed: Boolean(task.completed),
+        createdAt: task.createdAt || new Date().toISOString(),
+        updatedAt: task.updatedAt || task.createdAt || new Date().toISOString(),
+        priority:  PRIORITY_VALUES.includes(task.priority) ? task.priority : DEFAULT_PRIORITY,
+        dueDate:   task.dueDate || '',
+        category:  task.category || '',
+        order:     typeof task.order === 'number' ? task.order : 0,
     });
 
     // ─── Theme ──────────────────────────────────────────────────────────────
 
     /**
-     * Load saved theme preference
+     * Load saved theme preference.
+     * Falls back to the OS colour-scheme preference.
      * @returns {'dark'|'light'}
      */
     const loadTheme = () => {
         try {
             const saved = localStorage.getItem(THEME_KEY);
             if (saved === 'light' || saved === 'dark') return saved;
-            // Respect OS preference
             return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         } catch {
-            return 'dark';
+            return DEFAULTS.THEME;
         }
     };
 
     /**
-     * Save theme preference
+     * Persist theme preference.
      * @param {'dark'|'light'} theme
      */
     const saveTheme = (theme) => {
-        try {
-            localStorage.setItem(THEME_KEY, theme);
-        } catch (err) {
-            console.error('[Storage] Failed to save theme:', err);
-        }
+        try { localStorage.setItem(THEME_KEY, theme); }
+        catch (err) { console.error('[Storage] Failed to save theme:', err); }
     };
 
     // ─── Sort / Filter Preferences ──────────────────────────────────────────
 
     /**
-     * Load saved sort preference
+     * Load saved sort preference.
      * @returns {string}
      */
     const loadSort = () => {
-        try {
-            return localStorage.getItem(SORT_KEY) || 'newest';
-        } catch {
-            return 'newest';
-        }
+        try { return localStorage.getItem(SORT_KEY) || DEFAULTS.SORT; }
+        catch { return DEFAULTS.SORT; }
     };
 
     /**
-     * Save sort preference
+     * Persist sort preference.
      * @param {string} sort
      */
     const saveSort = (sort) => {
@@ -127,19 +122,16 @@ const Storage = (() => {
     };
 
     /**
-     * Load saved filter preference
+     * Load saved filter preference.
      * @returns {string}
      */
     const loadFilter = () => {
-        try {
-            return localStorage.getItem(FILTER_KEY) || 'all';
-        } catch {
-            return 'all';
-        }
+        try { return localStorage.getItem(FILTER_KEY) || DEFAULTS.FILTER; }
+        catch { return DEFAULTS.FILTER; }
     };
 
     /**
-     * Save filter preference
+     * Persist filter preference.
      * @param {string} filter
      */
     const saveFilter = (filter) => {
@@ -149,31 +141,32 @@ const Storage = (() => {
     // ─── Backup & Restore ───────────────────────────────────────────────────
 
     /**
-     * Create a JSON backup of all tasks
-     * @param {Array} tasks
+     * Create a JSON backup of all tasks and trigger a browser download.
+     * Receives the download utility as an explicit dependency (no hidden coupling).
+     * @param {Object[]} tasks
+     * @param {Function} downloadFn  - e.g. Utils.downloadFile
      */
-    const backup = (tasks) => {
+    const backup = (tasks, downloadFn) => {
         const data = {
             version:    APP_VERSION,
             exportedAt: new Date().toISOString(),
             taskCount:  tasks.length,
-            tasks:      tasks
+            tasks,
         };
-        const json = JSON.stringify(data, null, 2);
+        const json     = JSON.stringify(data, null, 2);
         const filename = `taskflow-backup-${new Date().toISOString().slice(0, 10)}.json`;
-        Utils.downloadFile(json, filename, 'application/json');
+        downloadFn(json, filename, 'application/json');
     };
 
     /**
-     * Parse and validate a backup file content
+     * Parse and validate a backup file's JSON content.
      * @param {string} jsonStr
-     * @returns {{ success: boolean, tasks: Array, error: string }}
+     * @returns {{ success: boolean, tasks: Object[], error: string }}
      */
     const parseBackup = (jsonStr) => {
         try {
             const data = JSON.parse(jsonStr);
 
-            // Support both direct array and wrapped format
             let rawTasks;
             if (Array.isArray(data)) {
                 rawTasks = data;
@@ -183,7 +176,10 @@ const Storage = (() => {
                 return { success: false, tasks: [], error: 'Invalid backup format.' };
             }
 
-            const tasks = rawTasks.map(migrateTask).filter(t => t.text && t.text.trim().length > 0);
+            const tasks = rawTasks
+                .map(_migrateTask)
+                .filter(t => t.text && t.text.trim().length > 0);
+
             return { success: true, tasks, error: '' };
         } catch (err) {
             return { success: false, tasks: [], error: `Failed to parse backup: ${err.message}` };
@@ -191,22 +187,22 @@ const Storage = (() => {
     };
 
     /**
-     * Get localStorage usage info
+     * Return current localStorage usage statistics.
      * @returns {{ used: number, total: number, percentUsed: number }}
      */
     const getStorageInfo = () => {
         try {
             let used = 0;
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    used += (localStorage[key].length + key.length) * 2; // bytes (UTF-16)
+            for (const key in localStorage) {
+                if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
+                    used += (localStorage[key].length + key.length) * 2;
                 }
             }
-            const total = 5 * 1024 * 1024; // 5MB typical limit
+            const total = 5 * 1024 * 1024;
             return {
-                used: Math.round(used / 1024), // KB
-                total: Math.round(total / 1024), // KB
-                percentUsed: Math.round((used / total) * 100)
+                used:        Math.round(used / 1024),
+                total:       Math.round(total / 1024),
+                percentUsed: Math.round((used / total) * 100),
             };
         } catch {
             return { used: 0, total: 5120, percentUsed: 0 };
@@ -225,6 +221,6 @@ const Storage = (() => {
         saveFilter,
         backup,
         parseBackup,
-        getStorageInfo
+        getStorageInfo,
     };
 })();
